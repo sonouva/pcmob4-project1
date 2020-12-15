@@ -10,6 +10,7 @@ import {
 const BUSSTOP_NUMBER = "46679";
 const BUS_NUMBER = "912";
 const BUSSTOP_URL = "https://arrivelah2.busrouter.sg/?id=" + BUSSTOP_NUMBER;
+const LOADING_INTERVAL = 60000;
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -26,16 +27,23 @@ export default function App() {
           (item) => item.no === BUS_NUMBER
         )[0];
         console.log(myBus);
-        const duration_s = Math.floor(myBus.next.duration_ms / 1000)
-        const minutes = Math.floor(duration_s / 60)
-        const seconds = duration_s % 60
-        setArrival(`${minutes} minutes and ${seconds} seconds`);
+        const duration_s = Math.floor(myBus.next["duration_ms"] / 1000); // same as myBus.next.duration_ms
+        const minutes = Math.floor(duration_s / 60);
+        const seconds = duration_s % 60;
+        if (duration_s < 0) {
+          setArrival(`Bus has arrived`);
+        } else {
+          setArrival(`${minutes} minutes and ${seconds} seconds`);
+        }
         setLoading(false);
       });
   }
 
   useEffect(() => {
-    loadBusStopData();
+    const interval = setInterval(loadBusStopData, LOADING_INTERVAL);
+    loadBusStopData(); // need to call it once at the start
+
+    return () => clearInterval(interval);
   }, []);
 
   return (

@@ -7,7 +7,9 @@ import {
   View,
 } from "react-native";
 
-const BUSSTOP_URL = "https://arrivelah2.busrouter.sg/?id=46679";
+const BUSSTOP_NUMBER = "46679";
+const BUS_NUMBER = "912";
+const BUSSTOP_URL = "https://arrivelah2.busrouter.sg/?id=" + BUSSTOP_NUMBER;
 
 export default function App() {
   const [loading, setLoading] = useState(true);
@@ -21,10 +23,13 @@ export default function App() {
       .then((responseData) => {
         //console.log(responseData)
         const myBus = responseData.services.filter(
-          (item) => item.no === "912"
+          (item) => item.no === BUS_NUMBER
         )[0];
         console.log(myBus);
-        setArrival(myBus.next.time);
+        const duration_s = Math.floor(myBus.next.duration_ms / 1000)
+        const minutes = Math.floor(duration_s / 60)
+        const seconds = duration_s % 60
+        setArrival(`${minutes} minutes and ${seconds} seconds`);
         setLoading(false);
       });
   }
